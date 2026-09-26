@@ -20,3 +20,5 @@ experiments/results/*
 !data/ports/*.csv
 !data/vessels/*.csv
 .ipynb_checkpoints/
+.agents/
+
