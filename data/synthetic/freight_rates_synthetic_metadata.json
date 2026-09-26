@@ -1,0 +1,52 @@
+{
+  "data_source": "synthetic",
+  "seed": 42,
+  "generated_at": "2026-09-24T05:06:28.608391Z",
+  "date_range": [
+    "2018-01-01",
+    "2025-12-31"
+  ],
+  "rows": 187008,
+  "columns": [
+    "date",
+    "origin",
+    "destination",
+    "trade_lane",
+    "vessel_type",
+    "cargo_type",
+    "cargo_quantity_t",
+    "route_distance_nm",
+    "voyage_duration_days",
+    "freight_rate_usd_per_ton",
+    "bdi_proxy",
+    "brent_proxy_usd",
+    "iron_ore_price_usd",
+    "coal_price_usd",
+    "demand_indicator",
+    "supply_indicator",
+    "port_congestion_index",
+    "month",
+    "season",
+    "data_source"
+  ],
+  "origins": [
+    "Australia_Hedland",
+    "Indonesia_Banjarmasin",
+    "SouthAfrica_RichardsBay",
+    "Brazil_Tubarao"
+  ],
+  "destinations": [
+    "Paradip",
+    "Visakhapatnam",
+    "Gangavaram",
+    "Dhamra"
+  ],
+  "vessel_types": [
+    "Handysize",
+    "Supramax",
+    "Panamax",
+    "Capesize"
+  ],
+  "assumptions": "See file header docstring",
+  "warning": "NOT real freight data \u2014 for pipeline development only"
+}

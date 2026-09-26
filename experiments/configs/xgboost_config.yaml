@@ -1,0 +1,23 @@
+seed: 42
+xgboost:
+  n_estimators: 800
+  max_depth: 6
+  learning_rate: 0.05
+  subsample: 0.8
+  colsample_bytree: 0.8
+  colsample_bylevel: 0.8
+  reg_alpha: 0.1
+  reg_lambda: 1.0
+  min_child_weight: 3
+  gamma: 0.0
+  objective: reg:squarederror
+  eval_metric: rmse
+  tree_method: hist
+  random_state: 42
+  n_jobs: -1
+  early_stopping_rounds: 50
+horizons: [7, 14, 30]
+features:
+  numeric: 41  # lag/rolling/momentum/pct_change/bdi/brent/seasonality etc.
+  categorical: [origin, destination, trade_lane, vessel_type, cargo_type, season]  # one-hot, fitted on train
+leakage_checks: "lags/rolling shifted by 1; targets shifted -h; chronological split; encoders fit on train only; test untouched"
