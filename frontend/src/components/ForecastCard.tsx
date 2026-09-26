@@ -14,7 +14,7 @@ import { Analyzing, EmptyState } from "./ui";
 const TREND_STYLE: Record<string, string> = {
   RISING: "bg-red-50 text-red-700 border-red-200",
   FALLING: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  STABLE: "bg-sky-50 text-sky-800 border-sky-200",
+  STABLE: "bg-[#EEF1F3] text-[#2A6E8C] border-[#C9D8E2]",
   UNKNOWN: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
@@ -103,25 +103,25 @@ export default function ForecastCard({
             <ComposedChart data={data} margin={{ top: 12, right: 16, bottom: 4, left: 0 }}>
               <defs>
                 <linearGradient id="freightFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0E7C8C" stopOpacity={0.22} />
-                  <stop offset="100%" stopColor="#0E7C8C" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="#2A6E8C" stopOpacity={0.22} />
+                  <stop offset="100%" stopColor="#2A6E8C" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid stroke="#E2E8F0" strokeDasharray="3 5" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#64748B", fontFamily: "IBM Plex Mono" }} axisLine={{ stroke: "#CBD5E1" }} tickLine={false} />
+              <CartesianGrid stroke="#E3DAC3" strokeDasharray="3 5" vertical={false} />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#6E6A60", fontFamily: "IBM Plex Mono" }} axisLine={{ stroke: "#D8CFB8" }} tickLine={false} />
               <YAxis
                 domain={["auto", "auto"]}
-                tick={{ fontSize: 11, fill: "#64748B", fontFamily: "IBM Plex Mono" }}
+                tick={{ fontSize: 11, fill: "#6E6A60", fontFamily: "IBM Plex Mono" }}
                 axisLine={false} tickLine={false} width={56}
                 tickFormatter={(v: number) => `$${v.toFixed(0)}`}
               />
               <Tooltip
                 formatter={(value) => [`$${Number(value).toFixed(2)}/t`, "Freight"]}
                 labelFormatter={(l) => (l === "Now" ? "Current rate" : `${l} forecast`)}
-                contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", fontSize: 12 }}
+                contentStyle={{ borderRadius: 2, border: "1px solid #E3DAC3", fontSize: 12 }}
               />
               <Area type="monotone" dataKey="value" stroke="none" fill="url(#freightFill)" />
-              <Line type="monotone" dataKey="value" stroke="#0B1F3A" strokeWidth={2.5} dot={{ r: 4, fill: "#0E7C8C", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 6 }} />
+              <Line type="monotone" dataKey="value" stroke="#145D7A" strokeWidth={2.5} dot={{ r: 4, fill: "#2A6E8C", stroke: "#fff", strokeWidth: 2 }} activeDot={{ r: 6 }} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>

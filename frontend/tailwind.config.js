@@ -4,18 +4,45 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Gesso reference HTML — source of truth (warm canvas, not pale blue)
+        mist: "#F3EDE0",
+        canvas: "#F3EDE0",
+        paper: "#FFFFFF",
+        elevated: "#F5F5F5",
+        recessed: "#E9E4D7",
+        line: "#E3DAC3",
+        divider: "rgba(0,0,0,0.06)",
+        ink: {
+          DEFAULT: "#1A1A1A",
+          soft: "#6E6A60",
+        },
+        oxide: "#8F5251",
+        gesso: {
+          canvas: "#F3EDE0",
+          surface: "#FFFFFF",
+          elevated: "#F5F5F5",
+          recessed: "#E9E4D7",
+          fg: "#1A1A1A",
+          muted: "#6E6A60",
+          accent: "#2A6E8C",
+          accent2: "#406993",
+          primary: "#8F5251",
+          data1: "#145D7A",
+          data2: "#317493",
+          data3: "#4A8CAB",
+        },
         harbour: {
-          950: "#0A1628",
-          900: "#0B1F3A",
-          800: "#12294D",
-          700: "#1B3A66",
+          950: "#1A1A1A",
+          900: "#2B2A26",
+          800: "#3A3833",
+          700: "#2A6E8C",
         },
         ocean: {
-          700: "#0E5E7A",
-          600: "#0E7C8C",
-          500: "#1B6FA8",
-          100: "#D9EAF3",
-          50: "#EFF6FA",
+          700: "#2A6E8C",
+          600: "#317493",
+          500: "#406993",
+          100: "#DCE5EA",
+          50: "#F0EFE9",
         },
         signal: {
           buy: "#0E7A4D",
@@ -24,13 +51,19 @@ export default {
         },
       },
       fontFamily: {
-        display: ['"Space Grotesk"', '"IBM Plex Sans"', "system-ui", "sans-serif"],
-        body: ['"IBM Plex Sans"', "system-ui", "sans-serif"],
+        display: ['"Bricolage Grotesque"', '"Space Grotesk"', "system-ui", "sans-serif"],
+        body: ['"Schibsted Grotesk"', '"IBM Plex Sans"', "system-ui", "sans-serif"],
         mono: ['"IBM Plex Mono"', "ui-monospace", "monospace"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(10,22,40,.06), 0 8px 24px -12px rgba(10,22,40,.18)",
-        final: "0 24px 60px -20px rgba(11,31,58,.55)",
+        card: "0 1px 2px rgba(26,26,26,.05)",
+        final: "0 16px 40px -20px rgba(26,26,26,.35)",
+      },
+      borderRadius: {
+        gesso: "2px",
+      },
+      maxWidth: {
+        ops: "1280px",
       },
     },
   },

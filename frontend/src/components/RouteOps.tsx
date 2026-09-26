@@ -40,22 +40,22 @@ export function RouteCard({
         </div>
       </div>
       <div className="px-5 sm:px-6 py-5">
-        <svg viewBox="0 0 400 150" className="w-full rounded-lg border border-slate-200 bg-gradient-to-b from-ocean-50 to-white" role="img" aria-label={`Schematic route from ${origin} to ${dest}`}>
+        <svg viewBox="0 0 400 150" className="w-full rounded-[2px] border border-[#E3DAC3] bg-[#F5F1E8]" role="img" aria-label={`Schematic route from ${origin} to ${dest}`}>
           {[30, 55, 80, 105].map((y) => (
-            <path key={y} d={`M0 ${y} Q 100 ${y - 8} 200 ${y} T 400 ${y}`} stroke="#BFD9E8" strokeWidth="1" fill="none" strokeDasharray="2 5" opacity="0.8" />
+            <path key={y} d={`M0 ${y} Q 100 ${y - 8} 200 ${y} T 400 ${y}`} stroke="#D8CFB8" strokeWidth="1" fill="none" strokeDasharray="2 5" opacity="0.8" />
           ))}
-          <path d="M52 108 Q 200 10 348 96" stroke="#0B1F3A" strokeWidth="2.5" fill="none" className="route-dash" />
-          <circle cx="52" cy="108" r="9" fill="#0E7C8C" />
+          <path d="M52 108 Q 200 10 348 96" stroke="#1A1A1A" strokeWidth="2.5" fill="none" className="route-dash" />
+          <circle cx="52" cy="108" r="9" fill="#2A6E8C" />
           <circle cx="52" cy="108" r="4" fill="#fff" />
-          <text x="52" y="130" textAnchor="middle" fontSize="10" fill="#0B1F3A" fontWeight="700" fontFamily="Space Grotesk">{String(origin).split("_")[0]}</text>
-          <circle cx="348" cy="96" r="9" fill="#0B1F3A" />
+          <text x="52" y="130" textAnchor="middle" fontSize="10" fill="#1A1A1A" fontWeight="700" fontFamily="'Bricolage Grotesque', sans-serif">{String(origin).split("_")[0]}</text>
+          <circle cx="348" cy="96" r="9" fill="#8F5251" />
           <path d="M344 96h8M348 92v8" stroke="#fff" strokeWidth="2" />
-          <text x="348" y="118" textAnchor="middle" fontSize="10" fill="#0B1F3A" fontWeight="700" fontFamily="Space Grotesk">{dest}</text>
+          <text x="348" y="118" textAnchor="middle" fontSize="10" fill="#1A1A1A" fontWeight="700" fontFamily="'Bricolage Grotesque', sans-serif">{dest}</text>
           <g transform="translate(200,52)">
-            <rect x="-14" y="-6" width="28" height="10" rx="3" fill="#0B1F3A" />
-            <rect x="-4" y="-12" width="8" height="7" rx="1" fill="#0B1F3A" />
+            <rect x="-14" y="-6" width="28" height="10" rx="3" fill="#1A1A1A" />
+            <rect x="-4" y="-12" width="8" height="7" rx="1" fill="#1A1A1A" />
           </g>
-          <text x="200" y="24" textAnchor="middle" fontSize="9" fill="#0E7C8C" fontFamily="IBM Plex Mono" letterSpacing="2">BULK CARRIER · SCHEMATIC</text>
+          <text x="200" y="24" textAnchor="middle" fontSize="9" fill="#2A6E8C" fontFamily="IBM Plex Mono" letterSpacing="2">BULK CARRIER · SCHEMATIC</text>
         </svg>
         <p className="mt-2 text-center font-mono text-[11.5px] text-slate-600">
           <strong className="text-harbour-900">{String(origin).replace(/_/g, " ")}</strong> → <strong className="text-harbour-900">{dest}</strong>

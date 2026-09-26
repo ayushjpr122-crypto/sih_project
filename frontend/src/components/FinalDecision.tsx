@@ -23,11 +23,11 @@ export default function FinalDecision({
   }
   return (
     <section
-      className="overflow-hidden rounded-xl bg-harbour-950 text-white shadow-final rise"
+      className="overflow-hidden rounded-[2px] bg-harbour-950 text-white shadow-final rise"
       aria-labelledby="charter-recommendation-heading"
     >
       <div className="px-5 sm:px-6 pt-5 pb-4 border-b border-white/10">
-        <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-sky-300">
+        <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#D8CFB8]">
           Final decision · decision support
         </p>
         <h2 id="charter-recommendation-heading" className="font-display text-[13px] font-bold tracking-[0.14em] uppercase">
@@ -47,13 +47,13 @@ export default function FinalDecision({
             },
           ].map((s) => (
             <div key={s.k}>
-              <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-sky-200/80">{s.k}</dt>
+              <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#C9D8E2]">{s.k}</dt>
               <dd className="mt-0.5 font-display text-[15px] font-bold leading-snug">{s.v}</dd>
             </div>
           ))}
         </dl>
         {result.recommendation && (
-          <blockquote className="mt-5 rounded-lg border-l-4 border-sky-400 bg-white/[0.06] px-4 py-3 text-[13.5px] leading-relaxed text-slate-100">
+          <blockquote className="mt-5 rounded-[2px] border-l-4 border-[#2A6E8C] bg-white/[0.06] px-4 py-3 text-[13.5px] leading-relaxed text-slate-100">
             {result.recommendation}
           </blockquote>
         )}

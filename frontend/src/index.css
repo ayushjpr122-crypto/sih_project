@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -13,14 +13,17 @@ html {
 }
 
 body {
-  @apply bg-[#E7ECF2] text-slate-800 font-body;
+  @apply text-ink font-body;
+  /* Gesso reference HTML: warm sand/cream canvas is the dominant background */
+  background-color: #f3ede0;
   background-image:
-    radial-gradient(1100px 260px at 50% -80px, rgba(27, 111, 168, 0.10), transparent 70%);
+    radial-gradient(1100px 260px at 50% -80px, rgba(143, 82, 81, 0.06), transparent 70%),
+    radial-gradient(900px 220px at 85% 0%, rgba(64, 105, 147, 0.05), transparent 70%);
 }
 
 /* Visible keyboard focus everywhere */
 :focus-visible {
-  outline: 2px solid #1b6fa8;
+  outline: 2px solid #2A6E8C;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -38,49 +41,56 @@ body {
 }
 
 @layer components {
-  /* Primary content surface */
+  /* Primary content surface — white over warm #f3ede0 canvas, 2px radius, minimal shadow */
   .panel {
-    @apply bg-white rounded-xl shadow-card border border-slate-200/80;
+    @apply bg-white shadow-card border border-[#E3DAC3]/80;
+    border-radius: 2px;
   }
   .panel-head {
-    @apply px-5 sm:px-6 pt-5 pb-4 border-b border-slate-100;
+    @apply px-5 sm:px-6 pt-5 pb-4 border-b border-[rgba(0,0,0,0.06)];
   }
   .section-kicker {
-    @apply font-mono text-[10px] tracking-[0.18em] uppercase text-ocean-600;
+    @apply font-mono text-[10px] tracking-[0.18em] uppercase text-ocean-700;
   }
   .section-title {
     @apply font-display text-[13px] font-bold tracking-[0.14em] uppercase text-harbour-900;
   }
   /* Keep legacy class names used by section components */
   .card {
-    @apply bg-white rounded-xl shadow-card border border-slate-200/80;
+    @apply bg-white shadow-card border border-[#E3DAC3]/80;
+    border-radius: 2px;
   }
   .card-head {
-    @apply px-5 sm:px-6 pt-5 pb-4 border-b border-slate-100;
+    @apply px-5 sm:px-6 pt-5 pb-4 border-b border-[rgba(0,0,0,0.06)];
   }
   .card-title {
     @apply font-display text-[13px] font-bold tracking-[0.14em] uppercase text-harbour-900;
   }
   .card-kicker {
-    @apply font-mono text-[10px] tracking-[0.18em] uppercase text-ocean-600;
+    @apply font-mono text-[10px] tracking-[0.18em] uppercase text-ocean-700;
   }
   .field-label {
-    @apply font-mono text-[10px] tracking-[0.16em] uppercase text-slate-500 mb-1 block;
+    @apply font-mono text-[10px] tracking-[0.16em] uppercase text-[#6E6A60] mb-1 block;
   }
   .field-input {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-ocean-500 focus:ring-2 focus:ring-ocean-500/20 transition;
+    @apply w-full bg-white px-3 py-2 text-sm text-[#1A1A1A] outline-none focus:border-ocean-700 focus:ring-2 focus:ring-ocean-700/20 transition border border-[#D8CFB8];
+    border-radius: 2px;
   }
   .btn-primary {
-    @apply w-full rounded-lg bg-harbour-900 hover:bg-harbour-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-display font-semibold text-sm tracking-wide py-3 transition active:scale-[0.99];
+    @apply w-full bg-harbour-900 hover:bg-harbour-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-display font-semibold text-sm tracking-wide py-3 transition active:scale-[0.99];
+    border-radius: 2px;
   }
   .btn-ghost {
-    @apply w-full rounded-lg border border-harbour-900/25 bg-ocean-50 hover:bg-ocean-100 text-harbour-900 font-display font-semibold text-sm tracking-wide py-2.5 transition;
+    @apply w-full border border-harbour-900/25 bg-[#F5F1E8] hover:bg-[#E9E4D7] text-harbour-900 font-display font-semibold text-sm tracking-wide py-2.5 transition;
+    border-radius: 2px;
   }
   .btn-inline {
-    @apply inline-flex items-center gap-1.5 rounded-lg bg-harbour-900 hover:bg-harbour-800 text-white font-display font-semibold text-sm px-4 py-2 transition;
+    @apply inline-flex items-center gap-1.5 bg-harbour-900 hover:bg-harbour-800 text-white font-display font-semibold text-sm px-4 py-2 transition;
+    border-radius: 2px;
   }
   .btn-outline {
-    @apply inline-flex items-center gap-1.5 rounded-lg border border-harbour-900/25 bg-white hover:bg-ocean-50 text-harbour-900 font-display font-semibold text-sm px-4 py-2 transition;
+    @apply inline-flex items-center gap-1.5 border border-harbour-900/25 bg-white hover:bg-[#F5F1E8] text-harbour-900 font-display font-semibold text-sm px-4 py-2 transition;
+    border-radius: 2px;
   }
   .pill {
     @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-semibold tracking-[0.12em] uppercase;
@@ -88,7 +98,7 @@ body {
 
   /* Top navigation */
   .nav-link {
-    @apply relative px-3 py-2.5 text-[13px] font-semibold text-slate-500 hover:text-harbour-900 transition whitespace-nowrap;
+    @apply relative px-3 py-2.5 text-[13px] font-semibold text-[#6E6A60] hover:text-harbour-900 transition whitespace-nowrap;
   }
   .nav-link[aria-current="page"] {
     @apply text-harbour-950;
@@ -101,7 +111,7 @@ body {
     bottom: 2px;
     height: 2px;
     border-radius: 2px;
-    background: #0e7c8c;
+    background: #8f5251;
   }
 
   /* Data table */
@@ -109,10 +119,10 @@ body {
     @apply w-full text-sm border-collapse;
   }
   .data-table thead th {
-    @apply font-mono text-[10px] tracking-[0.14em] uppercase text-slate-500 font-semibold text-left px-3 py-2 border-b border-slate-200 bg-slate-50/70;
+    @apply font-mono text-[10px] tracking-[0.14em] uppercase text-[#6E6A60] font-semibold text-left px-3 py-2 border-b border-[#E3DAC3] bg-[#F5F1E8];
   }
   .data-table tbody td {
-    @apply px-3 py-2.5 border-b border-slate-100 align-top;
+    @apply px-3 py-2.5 border-b border-[rgba(0,0,0,0.06)] align-top;
   }
   .data-table tbody tr:last-child td {
     @apply border-b-0;
@@ -120,13 +130,60 @@ body {
 
   /* Key-value metric row (not a card) */
   .metric-label {
-    @apply font-mono text-[10px] tracking-[0.16em] uppercase text-slate-500;
+    @apply font-mono text-[10px] tracking-[0.16em] uppercase text-[#6E6A60];
   }
   .metric-value {
-    @apply font-display text-xl font-bold text-harbour-950;
+    @apply font-display text-xl font-bold text-harbour-950 tabular-nums;
   }
   .rule {
-    @apply border-t border-slate-200;
+    @apply border-t border-line;
+  }
+
+  /* Operations ledger */
+  .ops-row {
+    @apply flex items-baseline justify-between gap-4 py-2.5 border-b border-[rgba(0,0,0,0.06)];
+  }
+  .ops-row:last-child {
+    @apply border-b-0;
+  }
+
+  /* Status dot + label (never color-only) */
+  .status-dot {
+    @apply inline-block h-2 w-2 shrink-0 rounded-full;
+  }
+
+  /* Port ledger card */
+  .port-card {
+    @apply w-full text-left border border-line bg-white px-4 py-3 transition;
+    border-radius: 2px;
+  }
+  .port-card:hover {
+    @apply border-ocean-700/50;
+  }
+  .port-card[aria-current="true"] {
+    border-color: #2A6E8C;
+    background-color: #F5F1E8;
+    box-shadow: inset 3px 0 0 #8f5251, 0 0 0 1px rgba(42,110,140,.25);
+  }
+
+  /* Alert severity rails — plain declarations on the MarineAI tokens
+     (oxide #8F5251, amber-500, ocean-700 #2A6E8C) so they always emit. */
+  .alert-rail-critical { background-color: #8F5251; }
+  .alert-rail-warning { background-color: #F59E0B; }
+  .alert-rail-info { background-color: #2A6E8C; }
+
+  /* Globe — frame sits on the warm canvas, not a dark navy box */
+  .globe-frame {
+    @apply relative overflow-hidden border border-line bg-[#EFE7D3];
+    border-radius: 2px;
+  }
+  .globe-marker {
+    cursor: pointer;
+  }
+  .globe-marker:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+    border-radius: 9999px;
   }
 }
 
@@ -143,7 +200,7 @@ body {
   100% { background-position: 400px 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #e8edf3 25%, #f5f8fb 50%, #e8edf3 75%);
+  background: linear-gradient(90deg, #e9e4d7 25%, #f5f1e8 50%, #e9e4d7 75%);
   background-size: 800px 100%;
   animation: shimmer 1.3s infinite linear;
 }

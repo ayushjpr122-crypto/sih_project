@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { ViewKey } from "../nav";
-import { VIEWS } from "../nav";
+import { LOCKED_WITHOUT_RESULT, VIEWS } from "../nav";
 
 /** Page heading block: kicker + title + description. */
 export function PageHeader({
@@ -36,7 +36,7 @@ export function EmptyState({
   return (
     <div className="panel px-6 py-12 text-center">
       <div
-        className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-ocean-50 text-ocean-600"
+        className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#F5F1E8] text-[#2A6E8C]"
         aria-hidden
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -86,12 +86,12 @@ export function Pager({
   onNavigate: (v: ViewKey) => void;
   hasResult: boolean;
 }) {
-  const order: ViewKey[] = ["overview", "scenario", "forecast", "vessels", "route", "decision"];
+  const order: ViewKey[] = ["overview", "forecast", "optimizer", "route", "vessels", "ports", "simulator", "alerts"];
   const idx = order.indexOf(view);
   const prev = idx > 0 ? order[idx - 1] : null;
   const next = idx < order.length - 1 ? order[idx + 1] : null;
   const label = (k: ViewKey) => VIEWS.find((v) => v.key === k)?.label ?? k;
-  const nextLocked = next !== null && !hasResult && next !== "overview" && next !== "scenario";
+  const nextLocked = next !== null && !hasResult && (LOCKED_WITHOUT_RESULT as string[]).includes(next);
 
   return (
     <div className="mt-6 flex items-center justify-between gap-3">
@@ -136,5 +136,69 @@ export function Section({
       </div>
       <div className="px-5 sm:px-6 py-5">{children}</div>
     </section>
+  );
+}
+
+/** Status indicator: dot plus text label (never color-only). */
+export function StatusIndicator({
+  tone,
+  label,
+}: {
+  tone: "ok" | "warn" | "bad" | "info" | "muted";
+  label: string;
+}) {
+  const color =
+    tone === "ok"
+      ? "bg-emerald-500"
+      : tone === "warn"
+        ? "bg-amber-500"
+        : tone === "bad"
+          ? "bg-[#8F5251]"
+          : tone === "info"
+            ? "bg-ocean-700"
+            : "bg-slate-300";
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-700">
+      <span className={`status-dot ${color}`} aria-hidden />
+      {label}
+    </span>
+  );
+}
+
+/** Metric strip: divided key-values, not nested cards. */
+export function MetricStrip({ items }: { items: { k: string; v: string; sub?: string }[] }) {
+  return (
+    <section className="panel" aria-label="Key metrics">
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-4 px-5 sm:px-6 py-5 sm:grid-cols-4">
+        {items.map((s) => (
+          <div key={s.k}>
+            <dt className="metric-label">{s.k}</dt>
+            <dd className="mt-0.5 font-display text-[15px] font-bold text-harbour-950">{s.v}</dd>
+            {s.sub ? <dd className="text-[11.5px] text-slate-500">{s.sub}</dd> : null}
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+/** Section heading for dense operational pages. */
+export function SectionHeader({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h3 className="font-display text-lg font-bold tracking-tight text-harbour-950">{title}</h3>
+        {description ? <p className="mt-0.5 max-w-2xl text-[13px] text-slate-600">{description}</p> : null}
+      </div>
+      {action}
+    </div>
   );
 }

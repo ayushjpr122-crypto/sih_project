@@ -1,5 +1,5 @@
 import type { ViewKey } from "../nav";
-import { VIEWS } from "../nav";
+import { LOCKED_WITHOUT_RESULT, VIEWS } from "../nav";
 
 export default function Nav({
   view,
@@ -11,12 +11,12 @@ export default function Nav({
   hasResult: boolean;
 }) {
   return (
-    <nav aria-label="Primary" className="bg-white border-b border-slate-200">
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+    <nav aria-label="Primary" className="bg-white border-b border-line">
+      <div className="mx-auto max-w-ops px-4 sm:px-6">
         {/* Mobile: horizontal scroll; desktop: single row */}
         <ul className="flex gap-1 overflow-x-auto">
           {VIEWS.map((v) => {
-            const disabled = !hasResult && v.key !== "overview" && v.key !== "scenario";
+            const disabled = !hasResult && LOCKED_WITHOUT_RESULT.includes(v.key);
             return (
               <li key={v.key} className="shrink-0">
                 {disabled ? (
@@ -25,6 +25,7 @@ export default function Nav({
                     aria-disabled="true"
                     title="Run an analysis to unlock this section"
                   >
+                    <span className="mr-1.5 font-mono text-[10px] text-slate-400">{v.index}</span>
                     {v.label}
                   </span>
                 ) : (
@@ -37,6 +38,7 @@ export default function Nav({
                       onNavigate(v.key);
                     }}
                   >
+                    <span className="mr-1.5 font-mono text-[10px] text-ocean-600">{v.index}</span>
                     {v.label}
                   </a>
                 )}

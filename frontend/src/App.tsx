@@ -2,13 +2,15 @@ import { useCallback, useEffect, useState } from "react";
 import Header from "./components/Header";
 import Nav from "./components/Nav";
 import type { ViewKey } from "./nav";
-import { VIEWS } from "./nav";
+import { VIEW_KEYS, resolveView } from "./nav";
 import {
-  DecisionPage,
+  AlertsPage,
   ForecastPage,
+  OptimizerPage,
   OverviewPage,
+  PortsPage,
   RoutePage,
-  ScenarioPage,
+  SimulatorPage,
   VesselsPage,
   type SharedProps,
 } from "./pages";
@@ -18,6 +20,7 @@ import type {
   DecisionResponse,
   PortInfo,
   ScenarioForm,
+  VesselClassInfo,
 } from "./types";
 
 const DEFAULT_FORM: ScenarioForm = {
@@ -37,27 +40,33 @@ function prettifyContract(raw: string): string {
   return raw;
 }
 
-const VIEW_KEYS = VIEWS.map((v) => v.key);
-
-function viewFromHash(): ViewKey {
+function viewFromLocation(): ViewKey {
   const h = window.location.hash.replace(/^#\/?/, "").split("?")[0];
-  return (VIEW_KEYS as string[]).includes(h) ? (h as ViewKey) : "overview";
+  if (h) return resolveView(h);
+  const p = window.location.pathname.replace(/^\/+/, "").split("/")[0].split("?")[0];
+  if (p) return resolveView(p);
+  return "overview";
 }
 
 export default function App() {
-  const [view, setView] = useState<ViewKey>(() => viewFromHash());
+  const [view, setView] = useState<ViewKey>(() => viewFromLocation());
   const [form, setForm] = useState<ScenarioForm>(DEFAULT_FORM);
   const [ports, setPorts] = useState<PortInfo[]>([]);
+  const [vessels, setVessels] = useState<VesselClassInfo[]>([]);
   const [result, setResult] = useState<DecisionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [demoLoading, setDemoLoading] = useState(false);
 
-  // Keep view in sync with the URL hash (back/forward + deep links).
+  // Keep view in sync with URL hash or pathname (back/forward + deep links).
   useEffect(() => {
-    const onHash = () => setView(viewFromHash());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    const onLocationChange = () => setView(viewFromLocation());
+    window.addEventListener("hashchange", onLocationChange);
+    window.addEventListener("popstate", onLocationChange);
+    return () => {
+      window.removeEventListener("hashchange", onLocationChange);
+      window.removeEventListener("popstate", onLocationChange);
+    };
   }, []);
 
   const navigate = useCallback((v: ViewKey) => {
@@ -71,11 +80,14 @@ export default function App() {
     []
   );
 
-  // Reference port data for the Route view (non-blocking).
+  // Reference data for Route / Ports / Vessels views (non-blocking).
   useEffect(() => {
     let alive = true;
     api.getPorts()
       .then((p) => { if (alive) setPorts(p.ports ?? []); })
+      .catch(() => {});
+    api.getVessels()
+      .then((v) => { if (alive) setVessels(v.vessels ?? []); })
       .catch(() => {});
     return () => { alive = false; };
   }, []);
@@ -134,10 +146,9 @@ export default function App() {
     demoLoading,
     result,
     ports,
+    vessels,
     onNavigate: navigate,
   };
-
-  const activeHint = VIEWS.find((v) => v.key === view)?.hint ?? "";
 
   return (
     <div className="min-h-screen">
@@ -145,9 +156,9 @@ export default function App() {
       <Header />
       <Nav view={view} onNavigate={navigate} hasResult={result !== null} />
 
-      <main id="main-content" className="mx-auto max-w-[1200px] px-4 sm:px-6 py-6" aria-label={activeHint}>
+      <main id="main-content" className="mx-auto max-w-ops px-4 sm:px-6 py-6">
         {error && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-5 py-4 rise" role="alert">
+          <div className="mb-4 rounded-[2px] border border-red-200 bg-red-50 px-5 py-4 rise" role="alert">
             <div className="flex items-start gap-3">
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-red-100 text-red-700 font-bold" aria-hidden>!</span>
               <div>
@@ -161,17 +172,21 @@ export default function App() {
         )}
 
         {view === "overview" && <OverviewPage {...shared} />}
-        {view === "scenario" && <ScenarioPage {...shared} />}
         {view === "forecast" && <ForecastPage {...shared} />}
-        {view === "vessels" && <VesselsPage {...shared} />}
+        {view === "optimizer" && <OptimizerPage {...shared} />}
         {view === "route" && <RoutePage {...shared} />}
-        {view === "decision" && <DecisionPage {...shared} />}
+        {view === "vessels" && <VesselsPage {...shared} />}
+        {view === "ports" && <PortsPage {...shared} />}
+        {view === "simulator" && <SimulatorPage {...shared} />}
+        {view === "alerts" && <AlertsPage {...shared} />}
 
-        <footer className="mt-10 border-t border-slate-200 pt-4 pb-8 text-[11.5px] text-slate-500">
-          <p className="font-display font-semibold text-harbour-900">Freight Intelligence</p>
-          <p className="mt-0.5">Bulk cargo forecasting &amp; vessel chartering decision support.</p>
+        <footer className="mt-10 border-t border-line pt-4 pb-8 text-[11.5px] text-slate-500">
+          <p className="font-display font-semibold text-harbour-900">MARINEAI · Freight Intelligence</p>
+          <p className="mt-0.5">Bulk cargo forecasting, vessel optimization and port intelligence for East Coast India.</p>
         </footer>
       </main>
     </div>
   );
 }
+
+export { VIEW_KEYS };

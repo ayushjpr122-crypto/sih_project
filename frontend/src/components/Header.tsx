@@ -1,10 +1,10 @@
 export default function Header() {
   return (
     <header className="bg-harbour-950 text-white">
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+      <div className="mx-auto max-w-ops px-4 sm:px-6">
         <div className="flex items-center gap-3 py-3.5">
           <div
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-ocean-600 ring-1 ring-white/20"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-[2px] bg-[#2A6E8C] ring-1 ring-white/20"
             aria-hidden
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -14,11 +14,17 @@ export default function Header() {
           </div>
           <div className="min-w-0">
             <p className="font-display text-[17px] font-bold leading-tight tracking-tight">
-              Freight Intelligence
+              MARINEAI <span className="font-medium text-slate-300">/ Freight Intelligence</span>
             </p>
             <p className="truncate text-[12px] text-slate-300">
-              Bulk cargo forecasting &amp; vessel chartering
+              Maritime operations control center · East Coast India
             </p>
+          </div>
+          <div className="ml-auto hidden items-center gap-2 sm:flex" aria-hidden>
+            <span className="live-dot inline-block h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="font-mono text-[10px] tracking-[0.18em] text-slate-300">
+              OPS WATCH
+            </span>
           </div>
         </div>
       </div>

@@ -68,7 +68,7 @@ export default function ScenarioCard({ form, onChange, onLoadDemo, onAnalyze, lo
           </div>
           <div>
             <span className="field-label" id="horizon-label">Forecast Horizon</span>
-            <div className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1" role="group" aria-labelledby="horizon-label">
+            <div className="grid grid-cols-3 gap-1 rounded-[2px] bg-[#E9E4D7] p-1" role="group" aria-labelledby="horizon-label">
               {HORIZONS.map((h) => (
                 <button key={h} type="button"
                   onClick={() => onChange({ horizon_days: h })}
@@ -86,7 +86,7 @@ export default function ScenarioCard({ form, onChange, onLoadDemo, onAnalyze, lo
         </div>
         <div className="grid gap-2 sm:grid-cols-2 pt-1">
           <button type="button" className="btn-ghost" onClick={onLoadDemo} disabled={demoLoading || loading}>
-            {demoLoading ? "Loading demo…" : "⤓  Load Demo Scenario"}
+            {demoLoading ? "Loading example…" : "⤓  Load Example Scenario"}
           </button>
           <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? (
@@ -101,7 +101,7 @@ export default function ScenarioCard({ form, onChange, onLoadDemo, onAnalyze, lo
           </button>
         </div>
         <p className="text-[11.5px] leading-relaxed text-slate-500">
-          Load a representative demo scenario, or enter your own figures and run the analysis.
+          Load a representative example scenario, or enter your own figures and run the analysis.
           Results are produced by the forecasting service — nothing is hardcoded.
         </p>
       </form>
