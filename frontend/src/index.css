@@ -1,0 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  @apply bg-[#E9EEF4] text-slate-800 font-body;
+  background-image:
+    radial-gradient(1200px 300px at 50% -80px, rgba(27, 111, 168, 0.12), transparent 70%),
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(11, 31, 58, 0.035) 27px 28px);
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-card border border-slate-200/80;
+  }
+  .card-head {
+    @apply flex items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-slate-100;
+  }
+  .card-title {
+    @apply font-display text-[13px] font-bold tracking-[0.14em] uppercase text-harbour-900;
+  }
+  .card-kicker {
+    @apply font-mono text-[10px] tracking-[0.18em] uppercase text-ocean-600;
+  }
+  .field-label {
+    @apply font-mono text-[10px] tracking-[0.16em] uppercase text-slate-500 mb-1 block;
+  }
+  .field-input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-ocean-500 focus:ring-2 focus:ring-ocean-500/20 transition;
+  }
+  .btn-primary {
+    @apply w-full rounded-xl bg-harbour-900 hover:bg-harbour-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-display font-semibold text-sm tracking-wide py-3 transition active:scale-[0.99];
+  }
+  .btn-ghost {
+    @apply w-full rounded-xl border border-harbour-900/25 bg-ocean-50 hover:bg-ocean-100 text-harbour-900 font-display font-semibold text-sm tracking-wide py-2.5 transition;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-semibold tracking-[0.12em] uppercase;
+  }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise {
+  animation: rise-in 0.45s ease both;
+}
+.rise-1 { animation-delay: 0.05s; }
+.rise-2 { animation-delay: 0.12s; }
+.rise-3 { animation-delay: 0.19s; }
+.rise-4 { animation-delay: 0.26s; }
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #e8edf3 25%, #f5f8fb 50%, #e8edf3 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.3s infinite linear;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.live-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes dash-move {
+  to { stroke-dashoffset: -24; }
+}
+.route-dash {
+  stroke-dasharray: 6 6;
+  animation: dash-move 1.2s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .skeleton, .live-dot, .route-dash { animation: none; }
+}
