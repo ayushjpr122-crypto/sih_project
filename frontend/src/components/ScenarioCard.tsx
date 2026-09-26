@@ -17,29 +17,34 @@ const HORIZONS = [7, 14, 30];
 
 export default function ScenarioCard({ form, onChange, onLoadDemo, onAnalyze, loading, demoLoading }: Props) {
   return (
-    <section className="card overflow-hidden">
+    <section className="panel overflow-hidden" aria-labelledby="scenario-input-heading">
       <div className="card-head">
         <div>
-          <div className="card-kicker">01 · Charter Scenario</div>
-          <h2 className="card-title">Scenario Input</h2>
+          <p className="card-kicker">Charter scenario</p>
+          <h2 id="scenario-input-heading" className="card-title">Scenario Input</h2>
         </div>
-        <span className="pill bg-ocean-50 text-ocean-700 border border-ocean-100">POST /decision</span>
       </div>
-      <div className="p-5 space-y-4">
-        <div>
-          <label className="field-label" htmlFor="cargo">Cargo Type</label>
-          <select id="cargo" className="field-input" value={form.cargo_type}
-            onChange={(e) => onChange({ cargo_type: e.target.value })}>
-            {CARGOS.map((c) => <option key={c}>{c}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="field-label" htmlFor="qty">Cargo Quantity (tonnes)</label>
-          <input id="qty" type="number" min={1000} max={500000} step={1000} className="field-input font-mono"
-            value={form.cargo_quantity_t}
-            onChange={(e) => onChange({ cargo_quantity_t: Number(e.target.value) })} />
-        </div>
-        <div className="grid grid-cols-2 gap-3">
+      <form
+        className="px-5 sm:px-6 py-5 space-y-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onAnalyze();
+        }}
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="field-label" htmlFor="cargo">Cargo Type</label>
+            <select id="cargo" className="field-input" value={form.cargo_type}
+              onChange={(e) => onChange({ cargo_type: e.target.value })}>
+              {CARGOS.map((c) => <option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="field-label" htmlFor="qty">Cargo Quantity (tonnes)</label>
+            <input id="qty" type="number" min={1000} max={500000} step={1000} className="field-input font-mono"
+              value={form.cargo_quantity_t}
+              onChange={(e) => onChange({ cargo_quantity_t: Number(e.target.value) })} />
+          </div>
           <div>
             <label className="field-label" htmlFor="origin">Origin</label>
             <select id="origin" className="field-input" value={form.origin}
@@ -54,8 +59,6 @@ export default function ScenarioCard({ form, onChange, onLoadDemo, onAnalyze, lo
               {DESTINATIONS.map((d) => <option key={d}>{d}</option>)}
             </select>
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="field-label" htmlFor="contract">Contract Type</label>
             <select id="contract" className="field-input" value={form.contract_type}
@@ -64,11 +67,12 @@ export default function ScenarioCard({ form, onChange, onLoadDemo, onAnalyze, lo
             </select>
           </div>
           <div>
-            <span className="field-label">Forecast Horizon</span>
-            <div className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1" role="group" aria-label="Forecast horizon">
+            <span className="field-label" id="horizon-label">Forecast Horizon</span>
+            <div className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1" role="group" aria-labelledby="horizon-label">
               {HORIZONS.map((h) => (
                 <button key={h} type="button"
                   onClick={() => onChange({ horizon_days: h })}
+                  aria-pressed={form.horizon_days === h}
                   className={`rounded-md py-1.5 font-mono text-xs font-semibold transition ${
                     form.horizon_days === h
                       ? "bg-harbour-900 text-white shadow"
@@ -80,11 +84,11 @@ export default function ScenarioCard({ form, onChange, onLoadDemo, onAnalyze, lo
             </div>
           </div>
         </div>
-        <div className="space-y-2 pt-1">
+        <div className="grid gap-2 sm:grid-cols-2 pt-1">
           <button type="button" className="btn-ghost" onClick={onLoadDemo} disabled={demoLoading || loading}>
             {demoLoading ? "Loading demo…" : "⤓  Load Demo Scenario"}
           </button>
-          <button type="button" className="btn-primary" onClick={onAnalyze} disabled={loading}>
+          <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? (
               <span className="inline-flex items-center gap-2">
                 <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -96,11 +100,11 @@ export default function ScenarioCard({ form, onChange, onLoadDemo, onAnalyze, lo
             ) : "Analyze Scenario →"}
           </button>
         </div>
-        <p className="text-[11px] leading-relaxed text-slate-500">
-          Demo loads the live backend scenario (<span className="font-mono">GET /demo-scenario</span>).
-          Analysis runs the real decision engine (<span className="font-mono">POST /decision</span>) — no hardcoded results.
+        <p className="text-[11.5px] leading-relaxed text-slate-500">
+          Load a representative demo scenario, or enter your own figures and run the analysis.
+          Results are produced by the forecasting service — nothing is hardcoded.
         </p>
-      </div>
+      </form>
     </section>
   );
 }

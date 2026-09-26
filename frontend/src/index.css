@@ -13,18 +13,50 @@ html {
 }
 
 body {
-  @apply bg-[#E9EEF4] text-slate-800 font-body;
+  @apply bg-[#E7ECF2] text-slate-800 font-body;
   background-image:
-    radial-gradient(1200px 300px at 50% -80px, rgba(27, 111, 168, 0.12), transparent 70%),
-    repeating-linear-gradient(0deg, transparent 0 27px, rgba(11, 31, 58, 0.035) 27px 28px);
+    radial-gradient(1100px 260px at 50% -80px, rgba(27, 111, 168, 0.10), transparent 70%);
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid #1b6fa8;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 50;
+}
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+  @apply bg-harbour-900 text-white text-sm font-semibold px-4 py-2 rounded-lg;
 }
 
 @layer components {
+  /* Primary content surface */
+  .panel {
+    @apply bg-white rounded-xl shadow-card border border-slate-200/80;
+  }
+  .panel-head {
+    @apply px-5 sm:px-6 pt-5 pb-4 border-b border-slate-100;
+  }
+  .section-kicker {
+    @apply font-mono text-[10px] tracking-[0.18em] uppercase text-ocean-600;
+  }
+  .section-title {
+    @apply font-display text-[13px] font-bold tracking-[0.14em] uppercase text-harbour-900;
+  }
+  /* Keep legacy class names used by section components */
   .card {
-    @apply bg-white rounded-2xl shadow-card border border-slate-200/80;
+    @apply bg-white rounded-xl shadow-card border border-slate-200/80;
   }
   .card-head {
-    @apply flex items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-slate-100;
+    @apply px-5 sm:px-6 pt-5 pb-4 border-b border-slate-100;
   }
   .card-title {
     @apply font-display text-[13px] font-bold tracking-[0.14em] uppercase text-harbour-900;
@@ -39,27 +71,72 @@ body {
     @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-ocean-500 focus:ring-2 focus:ring-ocean-500/20 transition;
   }
   .btn-primary {
-    @apply w-full rounded-xl bg-harbour-900 hover:bg-harbour-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-display font-semibold text-sm tracking-wide py-3 transition active:scale-[0.99];
+    @apply w-full rounded-lg bg-harbour-900 hover:bg-harbour-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-display font-semibold text-sm tracking-wide py-3 transition active:scale-[0.99];
   }
   .btn-ghost {
-    @apply w-full rounded-xl border border-harbour-900/25 bg-ocean-50 hover:bg-ocean-100 text-harbour-900 font-display font-semibold text-sm tracking-wide py-2.5 transition;
+    @apply w-full rounded-lg border border-harbour-900/25 bg-ocean-50 hover:bg-ocean-100 text-harbour-900 font-display font-semibold text-sm tracking-wide py-2.5 transition;
+  }
+  .btn-inline {
+    @apply inline-flex items-center gap-1.5 rounded-lg bg-harbour-900 hover:bg-harbour-800 text-white font-display font-semibold text-sm px-4 py-2 transition;
+  }
+  .btn-outline {
+    @apply inline-flex items-center gap-1.5 rounded-lg border border-harbour-900/25 bg-white hover:bg-ocean-50 text-harbour-900 font-display font-semibold text-sm px-4 py-2 transition;
   }
   .pill {
     @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-semibold tracking-[0.12em] uppercase;
   }
+
+  /* Top navigation */
+  .nav-link {
+    @apply relative px-3 py-2.5 text-[13px] font-semibold text-slate-500 hover:text-harbour-900 transition whitespace-nowrap;
+  }
+  .nav-link[aria-current="page"] {
+    @apply text-harbour-950;
+  }
+  .nav-link[aria-current="page"]::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 2px;
+    height: 2px;
+    border-radius: 2px;
+    background: #0e7c8c;
+  }
+
+  /* Data table */
+  .data-table {
+    @apply w-full text-sm border-collapse;
+  }
+  .data-table thead th {
+    @apply font-mono text-[10px] tracking-[0.14em] uppercase text-slate-500 font-semibold text-left px-3 py-2 border-b border-slate-200 bg-slate-50/70;
+  }
+  .data-table tbody td {
+    @apply px-3 py-2.5 border-b border-slate-100 align-top;
+  }
+  .data-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  /* Key-value metric row (not a card) */
+  .metric-label {
+    @apply font-mono text-[10px] tracking-[0.16em] uppercase text-slate-500;
+  }
+  .metric-value {
+    @apply font-display text-xl font-bold text-harbour-950;
+  }
+  .rule {
+    @apply border-t border-slate-200;
+  }
 }
 
 @keyframes rise-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .rise {
-  animation: rise-in 0.45s ease both;
+  animation: rise-in 0.4s ease both;
 }
-.rise-1 { animation-delay: 0.05s; }
-.rise-2 { animation-delay: 0.12s; }
-.rise-3 { animation-delay: 0.19s; }
-.rise-4 { animation-delay: 0.26s; }
 
 @keyframes shimmer {
   0% { background-position: -400px 0; }

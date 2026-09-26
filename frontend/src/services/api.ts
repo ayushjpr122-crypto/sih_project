@@ -23,7 +23,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     });
   } catch {
     throw new Error(
-      "Unable to connect to the decision engine. Please check that the backend is running."
+      "Unable to complete the analysis. Please check your connection and try again."
     );
   }
   if (!res.ok) {

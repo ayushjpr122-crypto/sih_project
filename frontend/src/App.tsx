@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
-import FinalDecision from "./components/FinalDecision";
-import ForecastCard from "./components/ForecastCard";
 import Header from "./components/Header";
-import { OpsCard, RouteCard } from "./components/RouteOps";
-import ScenarioCard from "./components/ScenarioCard";
-import { RiskCard, TimingCard } from "./components/SideSignals";
-import VesselSection from "./components/VesselSection";
+import Nav from "./components/Nav";
+import type { ViewKey } from "./nav";
+import { VIEWS } from "./nav";
+import {
+  DecisionPage,
+  ForecastPage,
+  OverviewPage,
+  RoutePage,
+  ScenarioPage,
+  VesselsPage,
+  type SharedProps,
+} from "./pages";
 import { api } from "./services/api";
 import type {
-  BackendStatus,
   DecisionRequest,
   DecisionResponse,
   PortInfo,
@@ -32,29 +37,45 @@ function prettifyContract(raw: string): string {
   return raw;
 }
 
+const VIEW_KEYS = VIEWS.map((v) => v.key);
+
+function viewFromHash(): ViewKey {
+  const h = window.location.hash.replace(/^#\/?/, "").split("?")[0];
+  return (VIEW_KEYS as string[]).includes(h) ? (h as ViewKey) : "overview";
+}
+
 export default function App() {
+  const [view, setView] = useState<ViewKey>(() => viewFromHash());
   const [form, setForm] = useState<ScenarioForm>(DEFAULT_FORM);
-  const [status, setStatus] = useState<BackendStatus>("checking");
   const [ports, setPorts] = useState<PortInfo[]>([]);
-  const [portsNote, setPortsNote] = useState<string>("");
   const [result, setResult] = useState<DecisionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [demoLoading, setDemoLoading] = useState(false);
+
+  // Keep view in sync with the URL hash (back/forward + deep links).
+  useEffect(() => {
+    const onHash = () => setView(viewFromHash());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  const navigate = useCallback((v: ViewKey) => {
+    window.location.hash = `/${v}`;
+    setView(v);
+    window.scrollTo({ top: 0 });
+  }, []);
 
   const patchForm = useCallback(
     (patch: Partial<ScenarioForm>) => setForm((f) => ({ ...f, ...patch })),
     []
   );
 
-  // Backend health + reference ports (non-blocking for the demo flow).
+  // Reference port data for the Route view (non-blocking).
   useEffect(() => {
     let alive = true;
-    api.getHealth()
-      .then(() => { if (alive) setStatus("connected"); })
-      .catch(() => { if (alive) setStatus("down"); });
     api.getPorts()
-      .then((p) => { if (alive) { setPorts(p.ports ?? []); setPortsNote(p.note ?? ""); } })
+      .then((p) => { if (alive) setPorts(p.ports ?? []); })
       .catch(() => {});
     return () => { alive = false; };
   }, []);
@@ -73,10 +94,8 @@ export default function App() {
         horizon_days: ex.horizon_days,
         contract_type: prettifyContract(ex.contract_type),
       });
-      setStatus("connected");
     } catch (e) {
-      setStatus("down");
-      setError(e instanceof Error ? e.message : "Unable to load the demo scenario.");
+      setError(e instanceof Error ? e.message : "Unable to complete the analysis. Please try again.");
     } finally {
       setDemoLoading(false);
     }
@@ -98,86 +117,59 @@ export default function App() {
     try {
       const res = await api.analyzeDecision(payload);
       setResult(res);
-      setStatus("connected");
+      navigate("overview");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unable to connect to the decision engine. Please check that the backend is running.");
+      setError(e instanceof Error ? e.message : "Unable to complete the analysis. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [form]);
+  }, [form, navigate]);
+
+  const shared: SharedProps = {
+    form,
+    onPatchForm: patchForm,
+    onLoadDemo: loadDemo,
+    onAnalyze: analyze,
+    loading,
+    demoLoading,
+    result,
+    ports,
+    onNavigate: navigate,
+  };
+
+  const activeHint = VIEWS.find((v) => v.key === view)?.hint ?? "";
 
   return (
     <div className="min-h-screen">
-      <Header status={status} />
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+      <Header />
+      <Nav view={view} onNavigate={navigate} hasResult={result !== null} />
 
-      <main className="mx-auto max-w-[1440px] px-4 sm:px-6 py-5 space-y-4">
+      <main id="main-content" className="mx-auto max-w-[1200px] px-4 sm:px-6 py-6" aria-label={activeHint}>
         {error && (
-          <div className="card border-red-200 bg-red-50/70 px-5 py-4 rise" role="alert">
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-5 py-4 rise" role="alert">
             <div className="flex items-start gap-3">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-red-100 text-red-700 font-bold">!</span>
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-red-100 text-red-700 font-bold" aria-hidden>!</span>
               <div>
-                <p className="font-display text-sm font-bold text-red-900">Analysis unavailable</p>
-                <p className="text-[13px] text-red-800">{error}</p>
-                <p className="mt-1 text-[12px] text-red-700/80">
-                  Unable to connect to the decision engine. Please check that the backend is running.
+                <p className="font-display text-sm font-bold text-red-900">
+                  Unable to complete the analysis. Please try again.
                 </p>
+                <p className="mt-0.5 text-[13px] text-red-800">{error}</p>
               </div>
             </div>
           </div>
         )}
 
-        {result?.scenario_summary && !loading && (
-          <p className="rise rounded-xl border border-harbour-900/15 bg-white px-4 py-2.5 font-mono text-[11.5px] text-harbour-900">
-            ◈ {result.scenario_summary}
-          </p>
-        )}
+        {view === "overview" && <OverviewPage {...shared} />}
+        {view === "scenario" && <ScenarioPage {...shared} />}
+        {view === "forecast" && <ForecastPage {...shared} />}
+        {view === "vessels" && <VesselsPage {...shared} />}
+        {view === "route" && <RoutePage {...shared} />}
+        {view === "decision" && <DecisionPage {...shared} />}
 
-        {/* Row 1: scenario → forecast */}
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 lg:col-span-4 xl:col-span-3">
-            <ScenarioCard
-              form={form}
-              onChange={patchForm}
-              onLoadDemo={loadDemo}
-              onAnalyze={analyze}
-              loading={loading}
-              demoLoading={demoLoading}
-            />
-          </div>
-          <div className="col-span-12 lg:col-span-8 xl:col-span-9">
-            <ForecastCard result={result} loading={loading} />
-          </div>
-        </div>
-
-        {/* Row 2: vessels → timing/risk rail */}
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 lg:col-span-7">
-            <VesselSection result={result} loading={loading} />
-          </div>
-          <div className="col-span-12 lg:col-span-5 space-y-4">
-            <TimingCard result={result} loading={loading} />
-            <RiskCard result={result} loading={loading} />
-          </div>
-        </div>
-
-        {/* Row 3: route + operations */}
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 lg:col-span-5">
-            <RouteCard result={result} ports={ports} portsNote={portsNote} loading={loading} />
-          </div>
-          <div className="col-span-12 lg:col-span-7">
-            <OpsCard result={result} loading={loading} />
-          </div>
-        </div>
-
-        {/* Row 4: final decision */}
-        <FinalDecision result={result} loading={loading} />
-
-        <footer className="flex flex-wrap items-center justify-between gap-2 px-1 pt-1 pb-6 text-[11px] text-slate-500">
-          <span>
-            SIH26006 · Prototype · Synthetic/Domain-Informed Data — never present prototype numbers as actual SAIL operational data.
-          </span>
-          <span className="font-mono">API: {api.baseUrl}</span>
+        <footer className="mt-10 border-t border-slate-200 pt-4 pb-8 text-[11.5px] text-slate-500">
+          <p className="font-display font-semibold text-harbour-900">Freight Intelligence</p>
+          <p className="mt-0.5">Bulk cargo forecasting &amp; vessel chartering decision support.</p>
         </footer>
       </main>
     </div>
