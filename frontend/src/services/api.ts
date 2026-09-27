@@ -1,5 +1,5 @@
 /* Centralized API service — the ONLY place that talks to FastAPI.
-   Base URL from VITE_API_BASE_URL, dev default http://127.0.0.1:8000/api/v1 */
+   Base URL from VITE_API_BASE_URL, default relative /api/v1 (via Vite proxy) */
 import type {
   DecisionRequest,
   DecisionResponse,
@@ -12,7 +12,7 @@ import type {
 
 const BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ||
-  "http://127.0.0.1:8000/api/v1";
+  "/api/v1";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
