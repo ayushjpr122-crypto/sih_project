@@ -2,6 +2,14 @@ import { useMemo, useState } from "react";
 import { AlertItem, deriveAlerts } from "./components/Alerts";
 import FinalDecision from "./components/FinalDecision";
 import ForecastCard from "./components/ForecastCard";
+import {
+  CharterWindowCard,
+  ForecastRiskStrip,
+  ForecastSummaryCard,
+  HorizonTabs,
+  VoyagePortCard,
+  charterWindowHint,
+} from "./components/ForecastInsight";
 import GlobeView from "./components/GlobeView";
 import { IntelligencePanel, PortCard, portCapability } from "./components/Ports";
 import type { ViewKey } from "./nav";
@@ -165,7 +173,44 @@ export function ForecastPage(p: SharedProps) {
         title="Rate outlook"
         description="Modelled freight rates for this lane, with the current rate and 7, 14 and 30-day projections."
       />
-      <ForecastCard result={p.result} loading={p.loading} onGoScenario={() => p.onNavigate("simulator")} />
+      {!p.result && !p.loading ? (
+        <>
+          <ForecastCard result={p.result} loading={p.loading} onGoScenario={() => p.onNavigate("simulator")} />
+          <Pager view="forecast" onNavigate={p.onNavigate} hasResult={p.result !== null} />
+        </>
+      ) : (
+        <div className="space-y-5">
+          <HorizonTabs
+            result={p.result}
+            value={p.form.horizon_days}
+            onChange={(h) => p.onPatchForm({ horizon_days: h })}
+          />
+          <ForecastCard
+            result={p.result}
+            loading={p.loading}
+            highlightHorizon={p.form.horizon_days}
+            onGoScenario={() => p.onNavigate("simulator")}
+          />
+          <CharterWindowCard result={p.result} />
+          <VoyagePortCard result={p.result} />
+          <ForecastRiskStrip result={p.result} />
+          <ForecastSummaryCard
+            result={p.result}
+            windowHint={charterWindowHint(p.result)}
+            onNavigate={p.onNavigate}
+          />
+          <div className="panel px-5 sm:px-6 py-4">
+            <p className="text-[12.5px] leading-relaxed text-slate-500">
+              <strong className="text-harbour-900">Simulation, not live data.</strong>{" "}
+              What-if analysis lives in the{" "}
+              <button type="button" className="btn-inline" onClick={() => p.onNavigate("simulator")}>
+                Simulator →
+              </button>{" "}
+              Compare destinations, quantities and horizons side by side against the live model.
+            </p>
+          </div>
+        </div>
+      )}
       <Pager view="forecast" onNavigate={p.onNavigate} hasResult={p.result !== null} />
     </div>
   );

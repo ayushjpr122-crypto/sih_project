@@ -148,11 +148,61 @@ def get_market_context(
             "bdi_proxy": _safe_float(row.get("bdi_proxy")),
             "brent_proxy_usd": _safe_float(row.get("brent_proxy_usd")),
             "route_distance_nm": _safe_float(row.get("route_distance_nm")),
+            "voyage_duration_days": _safe_float(row.get("voyage_duration_days")),
+            "port_congestion_index": _safe_float(row.get("port_congestion_index")),
             "last_date": str(row.get("date", "")),
         }
-        return {k: v for k, v in ctx.items() if v is not None}
+        ctx = {k: v for k, v in ctx.items() if v is not None}
+        # Observed history leg (leakage-safe: past rows only) for the
+        # Forecast page trend chart. Panamax proxy; basis labeled.
+        history = get_rate_history(origin, destination, n=30)
+        if history:
+            ctx["rate_history"] = history
+            ctx["rate_history_basis"] = (
+                "last 30 observed daily synthetic rates for lane "
+                "(Panamax proxy)"
+            )
+        return ctx
     except Exception:
         return {}
+
+
+def get_rate_history(
+    origin: str, destination: str, vessel_class: str = "Panamax", n: int = 30
+) -> list[dict[str, Any]]:
+    """Last *n* observed daily rates for a lane (past data only, no leakage).
+
+    Reads the same processed dataset the inference module uses. Returns
+    ``[{"date": "YYYY-MM-DD", "rate": float}]`` oldest-first, or [] when
+    the lane has no rows.
+    """
+    try:
+        import pandas as _pd
+
+        _infmod = _require_inference()
+    except Exception:
+        return []
+    try:
+        df = _pd.read_parquet(_infmod.DATA_PROCESSED)
+        sub = df[
+            (df["origin"] == origin)
+            & (df["destination"] == destination)
+            & (df["vessel_type"] == vessel_class)
+        ].sort_values("date").tail(n)
+        out: list[dict[str, Any]] = []
+        for _, r in sub.iterrows():
+            try:
+                out.append(
+                    {
+                        "date": str(r["date"])[:10],
+                        "rate": round(float(r["freight_rate_usd_per_ton"]), 2),
+                    }
+                )
+            except Exception:
+                continue
+        return out
+    except Exception:
+        return []
 
 
 def rank_vessels(

@@ -85,6 +85,28 @@ export interface InfeasibleVessel {
   reason?: string;
 }
 
+export interface RateHistoryPoint {
+  date: string;
+  rate: number;
+}
+
+/** Known market_context keys served by the backend (all optional). */
+export interface MarketContext {
+  rolling_std_7?: number;
+  rolling_std_30?: number;
+  volatility_30?: number;
+  momentum_7?: number;
+  bdi_proxy?: number;
+  brent_proxy_usd?: number;
+  route_distance_nm?: number;
+  voyage_duration_days?: number;
+  port_congestion_index?: number;
+  last_date?: string;
+  rate_history?: RateHistoryPoint[];
+  rate_history_basis?: string;
+  [key: string]: unknown;
+}
+
 export interface RiskDriver {
   driver: string;
   level?: string;
@@ -114,7 +136,7 @@ export interface DecisionResponse {
     rolling_std_7_usd_per_ton?: number;
     basis?: string;
   } | null;
-  market_context?: Record<string, unknown>;
+  market_context?: MarketContext;
   feasible_vessels?: FeasibleVessel[];
   infeasible_vessels?: InfeasibleVessel[];
   recommended_vessel?: string | null;
