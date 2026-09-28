@@ -1,5 +1,8 @@
 /* Centralized API service — the ONLY place that talks to FastAPI.
-   Base URL from VITE_API_BASE_URL, default relative /api/v1 (via Vite proxy) */
+   Env-var resolution (first match wins):
+     1. VITE_API_BASE_URL — already includes /api/v1  (local .env, legacy)
+     2. VITE_API_URL      — bare origin (Vercel); we append /api/v1 here
+     3. fallback          — relative /api/v1 (Vite proxy, local dev)         */
 import type {
   DecisionRequest,
   DecisionResponse,
@@ -10,9 +13,19 @@ import type {
   VesselsResponse,
 } from "../types";
 
-const BASE_URL =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ||
-  "/api/v1";
+const _baseUrl = (() => {
+  // 1. Explicit base URL (local dev .env — already includes /api/v1)
+  const explicit = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "");
+  if (explicit) return explicit;
+  // 2. Bare origin set in Vercel (VITE_API_URL=https://...onrender.com)
+  const origin = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "");
+  if (origin) return `${origin}/api/v1`;
+  // 3. Relative fallback — Vite proxy forwards /api/* → localhost:8001
+  return "/api/v1";
+})();
+
+const BASE_URL = _baseUrl;
+
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
