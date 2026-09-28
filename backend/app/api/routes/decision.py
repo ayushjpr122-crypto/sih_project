@@ -19,6 +19,14 @@ log = get_logger("routes.decision")
 
 @router.post("/decision", summary="Charter decision for a freight scenario")
 async def create_decision(payload: DecisionRequest, db: Session = Depends(get_db)):
+    import time as _time
+
+    t_total = _time.perf_counter()
+    log.info(
+        "Decision request start: %s->%s qty=%.0f horizon=%s",
+        payload.origin, payload.destination,
+        float(payload.cargo_quantity_t), payload.horizon_days,
+    )
     outcome = decision_engine.run_decision(
         cargo_type=payload.cargo_type,
         cargo_quantity_t=float(payload.cargo_quantity_t),
@@ -27,6 +35,12 @@ async def create_decision(payload: DecisionRequest, db: Session = Depends(get_db
         horizon_days=int(payload.horizon_days),
         contract_type=payload.contract_type,
         vessel_preference=payload.vessel_preference,
+    )
+    log.info(
+        "Decision complete: %s->%s recommended=%s elapsed=%.2fs",
+        payload.origin, payload.destination,
+        outcome["response"].get("recommended_vessel"),
+        _time.perf_counter() - t_total,
     )
     response = outcome["response"]
     persist = outcome["persist"]

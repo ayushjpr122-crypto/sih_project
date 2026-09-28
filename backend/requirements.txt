@@ -7,8 +7,12 @@ SQLAlchemy==2.1.1
 httpx==0.28.1
 pandas>=3.0.0               # 3.x+ has Python 3.14 wheels; 3.0.5 requires numpy>=2.3.3
 numpy>=2.3.3                # minimum required by pandas 3.x on Python 3.14
-scikit-learn>=1.6.0         # 1.6+ ships Python 3.14 wheels
-xgboost>=2.1.4
+scikit-learn==1.9.0          # MUST match training env: artifacts pickled with 1.9.0 (1.9.1 raises InconsistentVersionWarning)
+xgboost==2.1.4               # MUST match training env: bundles serialized with 2.1.4
+# NOTE: do NOT add torch/transformers/datasets/accelerate here. The root
+# requirements.txt pulls CUDA torch -> nvidia-nccl-cu13 (~305MB+) + other
+# nvidia-* wheels, wasting disk and RAM on a CPU-only XGBoost API.
+# Render MUST build with: pip install -r backend/requirements.txt
 joblib>=1.4.2
 pyarrow>=18.0.0             # 18+ ships Python 3.14 wheels
 pytest==9.1.1

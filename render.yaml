@@ -1,0 +1,22 @@
+# SIH26006 backend — Render blueprint (CPU-only FastAPI + XGBoost).
+# This file codifies the dashboard settings so deploys are reproducible.
+# IMPORTANT: build installs backend/requirements.txt ONLY. The root
+# requirements.txt contains torch/transformers (CUDA) which pulls
+# nvidia-nccl-cu13 (~305MB) + other nvidia-* wheels — unnecessary for a
+# CPU-only XGBoost API and harmful on a 512MB instance.
+services:
+  - type: web
+    name: sih-project-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.7
+      # Replace with your real Vercel URL, e.g.
+      # https://<your-app>.vercel.app,http://localhost:5173,http://localhost:3000
+      - key: CORS_ORIGINS
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO

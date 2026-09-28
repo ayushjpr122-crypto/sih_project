@@ -37,9 +37,15 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(InferenceError)
     async def _inference(request: Request, exc: InferenceError):
         log.exception("500 inference failure (sanitized to client)")
+        # Structured body: stable error_type for the frontend, generic
+        # message with no filesystem paths or secrets.
         return JSONResponse(
             status_code=500,
-            content={"detail": "Internal model/inference error. Please retry later."},
+            content={
+                "detail": "Model inference failed. Please retry later.",
+                "error_type": "InferenceError",
+                "message": "Model loading or prediction failed. Please retry later.",
+            },
         )
 
     @app.exception_handler(RequestValidationError)

@@ -16,11 +16,26 @@ and models/final/best_model_by_horizon.json.
 If selection picks XGB, inference uses XGB artifacts; if Ridge, fallback to numpy ridge weights.
 """
 import json
+import logging
+import sys
+import threading
+import time
 import joblib
 from pathlib import Path
 from typing import Dict, Optional, List
 import numpy as np
 import pandas as pd
+
+log = logging.getLogger("sih.inference")
+if not log.handlers:
+    _handler = logging.StreamHandler(sys.stdout)
+    _handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
+    )
+    log.addHandler(_handler)
+log.setLevel(logging.INFO)
+log.propagate = False
+_lock = threading.Lock()
 
 BASE_DIR = Path(__file__).resolve().parents[2]  # repo root
 DATA_PROCESSED = BASE_DIR / "data/processed/ml_dataset.parquet"
@@ -38,29 +53,126 @@ def load_selection():
 
 SELECTION, BEST_BY_HORIZON = load_selection()
 
-# Cache
+# Process-wide lazy cache. Models load on first use per horizon and are
+# reused for all subsequent requests (never reloaded, never preloaded all
+# at startup to bound peak memory on small Render instances).
 _cache = {}
 
+# Horizons this service is allowed to load. Anything else is rejected
+# before touching disk.
+_ALLOWED_HORIZONS = (7, 14, 30)
+
+
+def load_dataset():
+    """Single cached read of ml_dataset.parquet (one copy per process).
+
+    Returns the DataFrame, or None when the artifact is missing/unreadable.
+    All per-request dataset access must go through here — never call
+    pd.read_parquet(DATA_PROCESSED) directly in request paths.
+    """
+    with _lock:
+        if "full_df" in _cache:
+            return _cache["full_df"]
+        if not DATA_PROCESSED.exists():
+            log.error("Dataset missing: %s", DATA_PROCESSED.name)
+            return None
+        t0 = time.perf_counter()
+        size_mb = DATA_PROCESSED.stat().st_size / 1e6
+        log.info("Loading dataset: %s (%.1f MB)", DATA_PROCESSED.name, size_mb)
+        try:
+            df = pd.read_parquet(DATA_PROCESSED)
+        except Exception as exc:
+            log.error("Dataset load failed: %s: %s", type(exc).__name__, exc)
+            return None
+        _cache["full_df"] = df
+        log.info(
+            "Dataset loaded: %s rows=%d cols=%d elapsed=%.2fs",
+            DATA_PROCESSED.name, len(df), len(df.columns),
+            time.perf_counter() - t0,
+        )
+        return df
+
+
+def lane_history(
+    origin: str, destination: str, vessel_class: str = "Panamax", n: int = 30
+) -> List[Dict]:
+    """Last-n observed daily rates for a lane from the CACHED dataset.
+
+    Zero file I/O: reuses load_dataset(). Returns oldest-first, or [].
+    """
+    df = load_dataset()
+    if df is None:
+        return []
+    try:
+        sub = df[
+            (df["origin"] == origin)
+            & (df["destination"] == destination)
+            & (df["vessel_type"] == vessel_class)
+        ].sort_values("date").tail(int(n))
+    except Exception:
+        return []
+    out: List[Dict] = []
+    for _, r in sub.iterrows():
+        try:
+            out.append(
+                {
+                    "date": str(r["date"])[:10],
+                    "rate": round(float(r["freight_rate_usd_per_ton"]), 2),
+                }
+            )
+        except Exception:
+            continue
+    return out
+
+
 def _load_xgb(horizon: int):
+    if horizon not in _ALLOWED_HORIZONS:
+        raise ValueError(f"horizon must be one of {_ALLOWED_HORIZONS}")
     key = f"xgb_{horizon}"
     if key in _cache:
         return _cache[key]
-    p = FINAL_DIR / f"xgboost_{horizon}d.joblib"
-    if not p.exists():
-        # try xgboost dir
-        p2 = XGB_DIR / f"xgboost_{horizon}d" / "model.joblib"
-        if not p2.exists():
-            return None, None, None
-        # load directory form
-        model = joblib.load(p2)
-        pre = joblib.load(p2.parent / "preprocessor.joblib")
-        meta = json.load(open(p2.parent / "metadata.json"))
+    with _lock:
+        if key in _cache:
+            return _cache[key]
+        p = FINAL_DIR / f"xgboost_{horizon}d.joblib"
+        if not p.exists():
+            # try xgboost dir
+            p2 = XGB_DIR / f"xgboost_{horizon}d" / "model.joblib"
+            if not p2.exists():
+                return None, None, None
+            # load directory form
+            t0 = time.perf_counter()
+            size_mb = p2.stat().st_size / 1e6
+            log.info("Loading model: %s (%.1f MB)", p2.name, size_mb)
+            model = joblib.load(p2)
+            pre = joblib.load(p2.parent / "preprocessor.joblib")
+            meta = json.load(open(p2.parent / "metadata.json"))
+            _cache[key] = (model, pre, meta)
+            log.info(
+                "Model loaded: %s elapsed=%.2fs", p2.name,
+                time.perf_counter() - t0,
+            )
+            return model, pre, meta
+        t0 = time.perf_counter()
+        size_mb = p.stat().st_size / 1e6
+        log.info(
+            "Loading model: %s horizon=%d (%.1f MB)", p.name, horizon, size_mb
+        )
+        try:
+            bundle = joblib.load(p)
+        except Exception as exc:
+            log.error(
+                "Model load failed: %s: %s: %s",
+                p.name, type(exc).__name__, exc,
+            )
+            raise
+        model, pre, meta = bundle["model"], bundle["preprocessor"], bundle["meta"]
         _cache[key] = (model, pre, meta)
+        log.info(
+            "Model loaded: %s horizon=%d elapsed=%.2fs",
+            p.name, horizon, time.perf_counter() - t0,
+        )
         return model, pre, meta
-    bundle = joblib.load(p)
-    model, pre, meta = bundle["model"], bundle["preprocessor"], bundle["meta"]
-    _cache[key] = (model, pre, meta)
-    return model, pre, meta
 
 def _load_ridge(horizon: int):
     key = f"ridge_{horizon}"
@@ -81,16 +193,9 @@ def _load_ridge(horizon: int):
 
 def _get_latest_row(origin: str, destination: str, vessel_class: str) -> Optional[pd.Series]:
     """Fetch most recent row for combo from ml_dataset. Leakage-safe: we only look at past rows up to max date."""
-    if not DATA_PROCESSED.exists():
+    df = load_dataset()
+    if df is None:
         return None
-    # cache full dataset?
-    if "full_df" not in _cache:
-        try:
-            df = pd.read_parquet(DATA_PROCESSED)
-            _cache["full_df"] = df
-        except Exception:
-            return None
-    df = _cache["full_df"]
     mask = (df["origin"] == origin) & (df["destination"] == destination) & (df["vessel_type"] == vessel_class)
     subset = df[mask]
     if subset.empty:

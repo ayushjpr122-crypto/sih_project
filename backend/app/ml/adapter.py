@@ -88,12 +88,24 @@ def forecast_all_horizons(
 ) -> tuple[dict[int, dict[str, Any]], float | None]:
     """Call the ACTUAL trained models for 7/14/30d. Never hardcode values.
 
+    Models load lazily per horizon on first use and are reused afterwards
+    (see src/models/inference.py cache). Never preloads all horizons at
+    startup.
+
     Returns (forecasts, current_freight_or_None).
     Raises RuntimeError on inference failure (mapped to HTTP 500 upstream).
     """
+    import time as _time
+
+    t_total = _time.perf_counter()
     inf = _require_inference()
     forecasts: dict[int, dict[str, Any]] = {}
     for h in (7, 14, 30):
+        t0 = _time.perf_counter()
+        log.info(
+            "Prediction start: horizon=%d lane=%s->%s vessel=%s",
+            h, origin, destination, vessel_class,
+        )
         try:
             detail = inf.predict_freight(
                 origin=origin,
@@ -104,7 +116,13 @@ def forecast_all_horizons(
                 return_detail=True,
             )
         except Exception as exc:
-            raise RuntimeError(f"forecast failed h={h}: {exc}") from exc
+            log.error(
+                "Prediction failed: horizon=%d error=%s",
+                h, type(exc).__name__,
+            )
+            raise RuntimeError(
+                f"forecast failed h={h} ({type(exc).__name__})"
+            ) from exc
         if isinstance(detail, dict):
             forecasts[h] = {
                 "forecast_usd_per_ton": float(detail["forecast_usd_per_ton"]),
@@ -115,7 +133,16 @@ def forecast_all_horizons(
                 "forecast_usd_per_ton": float(detail),
                 "model": "unknown",
             }
+        log.info(
+            "Prediction complete: horizon=%d model=%s rate=%.2f elapsed=%.2fs",
+            h, forecasts[h]["model"], forecasts[h]["forecast_usd_per_ton"],
+            _time.perf_counter() - t0,
+        )
     current = get_current_freight(origin, destination, vessel_class)
+    log.info(
+        "Forecasts done: lane=%s->%s elapsed=%.2fs",
+        origin, destination, _time.perf_counter() - t_total,
+    )
     return forecasts, current
 
 
@@ -172,36 +199,21 @@ def get_rate_history(
 ) -> list[dict[str, Any]]:
     """Last *n* observed daily rates for a lane (past data only, no leakage).
 
-    Reads the same processed dataset the inference module uses. Returns
+    Zero file I/O: served from the process-wide cached dataset in the
+    inference module (loaded once, reused). Returns
     ``[{"date": "YYYY-MM-DD", "rate": float}]`` oldest-first, or [] when
     the lane has no rows.
     """
     try:
-        import pandas as _pd
-
         _infmod = _require_inference()
     except Exception:
         return []
     try:
-        df = _pd.read_parquet(_infmod.DATA_PROCESSED)
-        sub = df[
-            (df["origin"] == origin)
-            & (df["destination"] == destination)
-            & (df["vessel_type"] == vessel_class)
-        ].sort_values("date").tail(n)
-        out: list[dict[str, Any]] = []
-        for _, r in sub.iterrows():
-            try:
-                out.append(
-                    {
-                        "date": str(r["date"])[:10],
-                        "rate": round(float(r["freight_rate_usd_per_ton"]), 2),
-                    }
-                )
-            except Exception:
-                continue
-        return out
-    except Exception:
+        return list(
+            _infmod.lane_history(origin, destination, vessel_class, n=n)
+        )
+    except Exception as exc:
+        log.warning("rate history unavailable: %s", type(exc).__name__)
         return []
 
 
@@ -214,6 +226,10 @@ def rank_vessels(
     risk_score: float | None = None,
 ) -> list[dict[str, Any]]:
     """Delegate ranking to the existing hybrid vessel_model (no reimplementation)."""
+    import time as _time
+
+    t0 = _time.perf_counter()
+    log.info("Ranking start: dest=%s qty=%.0f", destination, cargo_quantity_t)
     inf = _require_inference()
     vm = _require_vessel_model()
     # Canonical route context: latest row; destination overridden for port lookup.
@@ -224,13 +240,21 @@ def rank_vessels(
     row["cargo_quantity_t"] = float(cargo_quantity_t)
     row["destination"] = destination
     try:
-        return list(
+        ranked = list(
             vm.rank_feasible_vessels(
                 row, float(forecast_rate), ports_df, vessels_df, risk_score=risk_score
             )
         )
     except Exception as exc:
-        raise RuntimeError(f"vessel ranking failed: {exc}") from exc
+        log.error("Ranking failed: error=%s", type(exc).__name__)
+        raise RuntimeError(
+            f"vessel ranking failed ({type(exc).__name__})"
+        ) from exc
+    log.info(
+        "Ranking complete: dest=%s vessels=%d elapsed=%.2fs",
+        destination, len(ranked), _time.perf_counter() - t0,
+    )
+    return ranked
 
 
 def assess_risk(
@@ -263,6 +287,10 @@ def assess_risk(
             _pd.read_csv(settings.vessels_csv),
         )
 
+    import time as _time
+
+    t0 = _time.perf_counter()
+    log.info("Risk assessment start: lane=%s->%s", origin, destination)
     vm.load_constraints = _absolute_constraints  # type: ignore[method-assign]
     try:
         if cargo_quantity_t is None:
@@ -283,9 +311,16 @@ def assess_risk(
                 ports_df=ports_df, vessels_df=vessels_df,
             )
     except Exception as exc:
-        raise RuntimeError(f"risk assessment failed: {exc}") from exc
+        log.error("Risk assessment failed: error=%s", type(exc).__name__)
+        raise RuntimeError(
+            f"risk assessment failed ({type(exc).__name__})"
+        ) from exc
     finally:
         vm.load_constraints = _orig  # type: ignore[method-assign]
+    log.info(
+        "Risk assessment complete: lane=%s->%s elapsed=%.2fs",
+        origin, destination, _time.perf_counter() - t0,
+    )
     if isinstance(out, dict) and "overall" in out:
         return out
     return {"overall": "UNKNOWN", "drivers": {}}
