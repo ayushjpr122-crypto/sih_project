@@ -11,8 +11,9 @@ data/processed/*
 !data/processed/.gitkeep
 !data/processed/ml_dataset.parquet
 !data/processed/dataset_metadata.json
-/models/
-!/models/.gitkeep
+# NOTE: models/ is intentionally NOT ignored. The backend loads trained
+# artifacts from models/final/ at runtime, so Render needs them in git.
+# Total size is small (~9 MB) and every file is under GitHub's 100 MB limit.
 experiments/metrics/*
 !experiments/metrics/.gitkeep
 experiments/results/*
