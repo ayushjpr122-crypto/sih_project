@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import Header from "./components/Header";
-import Nav from "./components/Nav";
 import type { ViewKey } from "./nav";
 import { VIEW_KEYS, resolveView } from "./nav";
 import {
@@ -153,8 +152,7 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      <Header />
-      <Nav view={view} onNavigate={navigate} hasResult={result !== null} />
+      <Header view={view} onNavigate={navigate} hasResult={result !== null} />
 
       <main id="main-content" className="mx-auto max-w-ops px-4 sm:px-6 py-6">
         {error && (

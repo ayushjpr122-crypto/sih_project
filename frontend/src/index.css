@@ -99,8 +99,7 @@ body {
   /* Top navigation */
   .nav-link {
     @apply relative px-3 py-2.5 text-[13px] font-semibold text-[#6E6A60] hover:text-harbour-900 transition whitespace-nowrap;
-  }
-  .nav-link[aria-current="page"] {
+  }  .nav-link[aria-current="page"] {
     @apply text-harbour-950;
   }
   .nav-link[aria-current="page"]::after {
@@ -112,6 +111,18 @@ body {
     height: 2px;
     border-radius: 2px;
     background: #8f5251;
+  }
+
+  /* Unified single-row header controls */
+  .header-icon-btn {
+    @apply grid h-8 w-8 place-items-center text-[#6E6A60] hover:text-harbour-900 hover:bg-[#F5F1E8] transition;
+    border-radius: 2px;
+  }
+  .header-search-input {
+    @apply w-full bg-transparent text-[13px] text-ink outline-none;
+  }
+  .header-search-input::placeholder {
+    @apply text-slate-400;
   }
 
   /* Data table */
