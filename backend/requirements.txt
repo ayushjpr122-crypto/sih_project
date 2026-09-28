@@ -1,15 +1,15 @@
-# SIH26006 backend — pinned for reproducibility
+# SIH26006 backend — updated for Python 3.14 compatibility (Render deploy)
 setuptools>=75.0.0          # provides pkg_resources; required on Python 3.14+
 fastapi==0.141.1
 uvicorn==0.52.4
 pydantic==2.13.5
 SQLAlchemy==2.1.1
 httpx==0.28.1
-pandas==3.0.5
-numpy==1.26.4
-scikit-learn==1.5.0
-xgboost==2.1.4
-joblib==1.4.2
-pyarrow>=18.0.0             # 18+ ships Python 3.14 wheels; 17.x had no wheel and setup.py broke on Python 3.14
+pandas>=3.0.0               # 3.x+ has Python 3.14 wheels; 3.0.5 requires numpy>=2.3.3
+numpy>=2.3.3                # minimum required by pandas 3.x on Python 3.14
+scikit-learn>=1.6.0         # 1.6+ ships Python 3.14 wheels
+xgboost>=2.1.4
+joblib>=1.4.2
+pyarrow>=18.0.0             # 18+ ships Python 3.14 wheels
 pytest==9.1.1
 pytest-cov==7.1.0

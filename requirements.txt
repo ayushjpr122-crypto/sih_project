@@ -1,23 +1,24 @@
 # SIH26006 — Dataset + ML only
-# Pin versions for reproducibility
+# Versions updated for Python 3.14 compatibility (Render deploy)
+# Python 3.14 requires a modern scientific stack — old pins had no wheels.
 setuptools>=75.0.0          # provides pkg_resources; required on Python 3.14+
-numpy==1.26.4
-pandas==2.2.2
-scikit-learn==1.5.0
-scipy==1.14.1
-statsmodels==0.14.2
-torch==2.3.1
-transformers==4.44.2
-datasets==3.0.1
-evaluate==0.4.2
-accelerate==0.32.0
-optuna==3.6.1
-pyarrow>=18.0.0             # 18+ ships Python 3.14 wheels; 17.x had no wheel and setup.py broke on Python 3.14
-matplotlib==3.9.2
-seaborn==0.13.2
-tqdm==4.66.5
-pyyaml==6.0.1
-joblib==1.4.2
-xgboost==2.1.4
+numpy>=2.3.3                # pandas 3.x requires >=2.3.3 on Python 3.14
+pandas>=3.0.0               # 3.x+ has Python 3.14 wheels; 2.2.x did not
+scikit-learn>=1.6.0         # 1.6+ ships Python 3.14 wheels
+scipy>=1.15.0               # 1.15+ ships Python 3.14 wheels
+statsmodels>=0.14.4         # 0.14.4+ supports Python 3.14
+torch>=2.6.0                # 2.6+ ships Python 3.14 wheels
+transformers>=4.44.2
+datasets>=3.0.1
+evaluate>=0.4.2
+accelerate>=0.32.0
+optuna>=3.6.1
+pyarrow>=18.0.0             # 18+ ships Python 3.14 wheels
+matplotlib>=3.9.2
+seaborn>=0.13.2
+tqdm>=4.66.5
+pyyaml>=6.0.1
+joblib>=1.4.2
+xgboost>=2.1.4
 # Optional: chronos foundation via transformers if internet available
 # chronos-t5 is via transformers AutoModel
