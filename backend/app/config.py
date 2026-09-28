@@ -36,7 +36,16 @@ class Settings:
         default_factory=lambda: _csv_env(
             "CORS_ORIGINS",
             "http://localhost:3000,http://127.0.0.1:3000,"
-            "http://localhost:5173,http://127.0.0.1:5173",
+            "http://localhost:5173,http://127.0.0.1:5173,"
+            "https://sih-project-hvzy.vercel.app",
+        )
+    )
+    # Regex for preview deployments (Vercel generates a new URL per
+    # deploy). Allows https://*.vercel.app when set. Prototype-safe:
+    # still requires HTTPS and the vercel.app suffix.
+    cors_origin_regex: str = field(
+        default_factory=lambda: os.getenv(
+            "CORS_ORIGIN_REGEX", r"https://.*\.vercel\.app"
         )
     )
     log_level: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))

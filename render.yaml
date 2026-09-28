@@ -14,9 +14,9 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.14.7
-      # Replace with your real Vercel URL, e.g.
-      # https://<your-app>.vercel.app,http://localhost:5173,http://localhost:3000
       - key: CORS_ORIGINS
-        sync: false
+        value: https://sih-project-hvzy.vercel.app,http://localhost:5173,http://localhost:3000
+      - key: CORS_ORIGIN_REGEX
+        value: https://.*\.vercel\.app
       - key: LOG_LEVEL
         value: INFO
