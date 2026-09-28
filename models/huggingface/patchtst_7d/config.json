@@ -1,0 +1,8 @@
+{
+  "model_type": "patchtst-forecaster",
+  "n_features": 41,
+  "context_len": 30,
+  "d_model": 64,
+  "target_mean": 23.510271072387695,
+  "target_std": 8.06399917602539
+}

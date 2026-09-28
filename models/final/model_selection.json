@@ -1,0 +1,211 @@
+{
+  "selected_for_inference": "XGBoost",
+  "per_horizon": {
+    "7": {
+      "horizon": 7,
+      "best_model_val": "XGBoost",
+      "val_MAE": 1.8047338510992657,
+      "val_RMSE": 2.4006069375210446,
+      "val_sMAPE": 7.7773575429044755,
+      "val_R2": 0.9066684582236726,
+      "val_DirAcc": 71.1592356687898,
+      "test_MAE_of_best": 1.8772115053212144,
+      "all_val_ranking": [
+        {
+          "model": "XGBoost",
+          "MAE": 1.805,
+          "RMSE": 2.401,
+          "sMAPE": 7.777,
+          "R2": 0.907,
+          "DirectionalAccuracy": 71.159
+        },
+        {
+          "model": "Ridge",
+          "MAE": 1.836,
+          "RMSE": 2.433,
+          "sMAPE": 7.913,
+          "R2": 0.904,
+          "DirectionalAccuracy": 70.377
+        },
+        {
+          "model": "MA_7",
+          "MAE": 1.926,
+          "RMSE": 2.568,
+          "sMAPE": 8.268,
+          "R2": 0.893,
+          "DirectionalAccuracy": 68.641
+        },
+        {
+          "model": "ExpSmooth",
+          "MAE": 2.104,
+          "RMSE": 2.796,
+          "sMAPE": 9.029,
+          "R2": 0.873,
+          "DirectionalAccuracy": 68.641
+        },
+        {
+          "model": "MLP_Torch",
+          "MAE": 2.183,
+          "RMSE": 2.755,
+          "sMAPE": 9.858,
+          "R2": 0.877,
+          "DirectionalAccuracy": 65.82
+        },
+        {
+          "model": "Naive",
+          "MAE": 2.319,
+          "RMSE": 3.081,
+          "sMAPE": 9.949,
+          "R2": 0.846,
+          "DirectionalAccuracy": 0.015
+        },
+        {
+          "model": "HF_PatchTST",
+          "MAE": 3.054,
+          "RMSE": 3.715,
+          "sMAPE": 13.637,
+          "R2": 0.776,
+          "DirectionalAccuracy": 60.055
+        }
+      ]
+    },
+    "14": {
+      "horizon": 14,
+      "best_model_val": "XGBoost",
+      "val_MAE": 1.8490387849199954,
+      "val_RMSE": 2.461237755603068,
+      "val_sMAPE": 7.97303037624652,
+      "val_R2": 0.9019123531092922,
+      "val_DirAcc": 70.86442220200182,
+      "test_MAE_of_best": 1.944954134454476,
+      "all_val_ranking": [
+        {
+          "model": "XGBoost",
+          "MAE": 1.849,
+          "RMSE": 2.461,
+          "sMAPE": 7.973,
+          "R2": 0.902,
+          "DirectionalAccuracy": 70.864
+        },
+        {
+          "model": "Ridge",
+          "MAE": 1.908,
+          "RMSE": 2.514,
+          "sMAPE": 8.236,
+          "R2": 0.898,
+          "DirectionalAccuracy": 69.605
+        },
+        {
+          "model": "MA_7",
+          "MAE": 2.009,
+          "RMSE": 2.684,
+          "sMAPE": 8.637,
+          "R2": 0.883,
+          "DirectionalAccuracy": 67.356
+        },
+        {
+          "model": "ExpSmooth",
+          "MAE": 2.124,
+          "RMSE": 2.846,
+          "sMAPE": 9.123,
+          "R2": 0.869,
+          "DirectionalAccuracy": 67.356
+        },
+        {
+          "model": "Naive",
+          "MAE": 2.317,
+          "RMSE": 3.104,
+          "sMAPE": 9.949,
+          "R2": 0.844,
+          "DirectionalAccuracy": 0.022
+        },
+        {
+          "model": "MLP_Torch",
+          "MAE": NaN,
+          "RMSE": NaN,
+          "sMAPE": NaN,
+          "R2": NaN,
+          "DirectionalAccuracy": NaN
+        },
+        {
+          "model": "HF_PatchTST",
+          "MAE": NaN,
+          "RMSE": NaN,
+          "sMAPE": NaN,
+          "R2": NaN,
+          "DirectionalAccuracy": NaN
+        }
+      ]
+    },
+    "30": {
+      "horizon": 30,
+      "best_model_val": "XGBoost",
+      "val_MAE": 1.9635423305541326,
+      "val_RMSE": 2.595170113982743,
+      "val_sMAPE": 8.449875880812295,
+      "val_R2": 0.8909631323668571,
+      "val_DirAcc": 72.88080072793448,
+      "test_MAE_of_best": 2.09191769945953,
+      "all_val_ranking": [
+        {
+          "model": "XGBoost",
+          "MAE": 1.964,
+          "RMSE": 2.595,
+          "sMAPE": 8.45,
+          "R2": 0.891,
+          "DirectionalAccuracy": 72.881
+        },
+        {
+          "model": "Ridge",
+          "MAE": 2.161,
+          "RMSE": 2.83,
+          "sMAPE": 9.327,
+          "R2": 0.87,
+          "DirectionalAccuracy": 69.558
+        },
+        {
+          "model": "MA_7",
+          "MAE": 2.32,
+          "RMSE": 3.071,
+          "sMAPE": 9.981,
+          "R2": 0.847,
+          "DirectionalAccuracy": 65.809
+        },
+        {
+          "model": "ExpSmooth",
+          "MAE": 2.446,
+          "RMSE": 3.246,
+          "sMAPE": 10.505,
+          "R2": 0.829,
+          "DirectionalAccuracy": 65.809
+        },
+        {
+          "model": "Naive",
+          "MAE": 2.627,
+          "RMSE": 3.488,
+          "sMAPE": 11.275,
+          "R2": 0.803,
+          "DirectionalAccuracy": 0.018
+        },
+        {
+          "model": "MLP_Torch",
+          "MAE": NaN,
+          "RMSE": NaN,
+          "sMAPE": NaN,
+          "R2": NaN,
+          "DirectionalAccuracy": NaN
+        },
+        {
+          "model": "HF_PatchTST",
+          "MAE": NaN,
+          "RMSE": NaN,
+          "sMAPE": NaN,
+          "R2": NaN,
+          "DirectionalAccuracy": NaN
+        }
+      ]
+    }
+  },
+  "criterion": "Best val MAE primary; test for reporting only",
+  "seed": 42
+}
